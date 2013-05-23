@@ -1,0 +1,38 @@
+#! /usr/bin/env ruby
+
+require 'optparse'
+require_relative '../lib/biba'
+
+op = OptionParser.new do |opts|
+  opts.banner = "Biba: a tool for displaying annotated bibliographies"
+  opts.define_head "Usage: biba [options] <bibtex filename>"
+  opts.separator ""
+  opts.separator "Examples:"
+  opts.separator "  biba ./awesome_papers.bib"
+  opts.separator ""
+  opts.separator "Options:"
+
+  opts.on("-o", "--output [FILE]", "HTML file to create as output.") do |file|
+    @output = file
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+
+  opts.on_tail("-v", "--version", "Show version") do
+    puts Biba::VERSION
+    exit
+  end
+end
+
+op.parse!
+
+input = ARGV.shift.to_s.strip
+
+@bib = BibTeX.open(input)
+
+@builder = Biba::Builder.new(@bib)
+
+puts @builder.to_html
